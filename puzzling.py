@@ -35,6 +35,7 @@ asteroid1x = random.randint(0, 375)
 asteroid1y = 0
 asteroid1health = 1
 asteroid1destroy = False
+asteroid1falling = True
 
 def shootrocket(x, y):
     screen.blit(rocket, (x, y))
@@ -69,7 +70,7 @@ while running:
         shootrocket(rocketx + 36, rockety)
         rockety -= 1.5
 
-    if rockety == 0:
+    if rockety <= 0:
         firing = False
 
     spaceshipx += spaceshipxchange
@@ -78,11 +79,13 @@ while running:
     if spaceshipx > 375:
         spaceshipx = 375
     set_pos(spaceshipx, spaceshipy)
-    asteroid1y += 0.5
 
+    asteroid1y += 0.5
+    asteroidpos(asteroid1x, asteroid1y)
     if asteroid1y > 500:
         playerscore -= 1
-    asteroidpos(asteroid1x, asteroid1y)
+        asteroid1x = random.randint(0, 375)
+        asteroid1y = 0
 
     pygame.display.update()
 conn.commit()
