@@ -90,8 +90,9 @@ while running:
     set_pos(spaceshipx, spaceshipy)
 
     if asteroid1falling == True:
-        asteroid1y += 0.5
-        asteroidpos(asteroid1x, asteroid1y)
+        if timesfallen < 6:
+            asteroid1y += 0.5
+            asteroidpos(asteroid1x, asteroid1y)
 
         iscollided = hitasteroid1()
 
@@ -110,7 +111,17 @@ while running:
                 asteroid1x = random.randint(0, 375)
                 asteroid1y = 0
                 timesfallen += 1
-            #change when timesfallen is 6
+
+        if timesfallen >= 6 and timesfallen < 10:
+            asteroid1 = pygame.image.load('C:\\asteroid2.png')
+            asteroid1y += 1.25
+            asteroidpos(asteroid1x, asteroid1y)
+
+        if timesfallen >= 10 and timesfallen < 15:
+            asteroid1 = pygame.image.load('C:\\asteroid3.png')
+            asteroid1y += 1.5
+            asteroidpos(asteroid1x, asteroid1y)
+
         print(playerscore)
         print(playerhealth)
     pygame.display.update()
