@@ -23,6 +23,22 @@ spaceshipxchange = 0
 
 playerhealth = 3
 playerscore = 0
+font = pygame.font.Font('freesansbold.ttf', 28)
+
+textx = 376
+texty = 0
+healthx = 375
+healthy = 30
+highx = 0
+highy = 0
+
+def showscore(x, y):
+    score = font.render('Score: '+str(playerscore), True, (0, 0, 0))
+    screen.blit(score, (x, y))
+
+def showhealth(x, y):
+    health = font.render('Health: '+str(playerhealth), True, (0, 0, 0))
+    screen.blit(health, (x,y))
 
 rocket = pygame.image.load('C:\\rocket.png')
 rocketshipx = 0
@@ -117,13 +133,13 @@ while running:
             asteroid1y += 1.25
             asteroidpos(asteroid1x, asteroid1y)
 
-        if timesfallen >= 10 and timesfallen < 15:
+        if timesfallen >= 10 and timesfallen < 16:
             asteroid1 = pygame.image.load('C:\\asteroid3.png')
             asteroid1y += 1.5
             asteroidpos(asteroid1x, asteroid1y)
 
-        print(playerscore)
-        print(playerhealth)
+        showscore(textx, texty)
+        showhealth(healthx, healthy)
     pygame.display.update()
 conn.commit()
 conn.close()
