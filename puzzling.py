@@ -1,12 +1,12 @@
 import pygame, random, sqlite3, math
-
+from pygame import mixer
 
 pygame.init()
 
 conn = sqlite3.connect('Scores.db')
 c = conn.cursor()
-# c.execute('''CREATE TABLE scores (
-#             score integer)''')
+c.execute('''CREATE TABLE scores (
+           score integer)''')
 
 screen = pygame.display.set_mode((500, 500))
 running = True
@@ -20,6 +20,9 @@ spaceship = pygame.image.load('C:\\spaceshipp.png')
 spaceshipx = 185
 spaceshipy = 375
 spaceshipxchange = 0
+
+mixer.music.load('C:\\sci-fi-spaceship-computer-sound-effect.mp3')
+mixer.music.play(-1)
 
 playerhealth = 3
 playerscore = 0
@@ -55,8 +58,24 @@ asteroid1destroy = False
 asteroid1falling = True
 timesfallen = 1
 
+
+bigfont = pygame.font.SysFont('calibri.', 35)
+
+def gameoverscreen():
+    gameover = bigfont.render(f'GAME OVER', True, (255, 0, 0))
+    screen.blit(gameover, (160, 235))
+
 def shootrocket(x, y):
     screen.blit(rocket, (x, y))
+
+def highscore():
+    conn = sqlite3.connect('Scores.db')
+    c = conn.cursor()
+    c.execute('SELECT score FROM scores')
+    allscores = c.fetchall()
+    greatest2least = sorted(allscores, reverse=True)
+    highscore = font.render('High Score: '+str(greatest2least[0][0]), True, (0,0,0))
+    screen.blit(highscore, (300, 60))
 
 def set_pos(x, y):
     screen.blit(spaceship, (x, y))
@@ -64,6 +83,8 @@ def set_pos(x, y):
 def hitasteroid1():
     distance = math.sqrt((math.pow(asteroid1x-rocketx, 2)) + (math.pow(asteroid1y-rockety, 2)))
     if distance < 40:
+        collidesound = mixer.Sound('C:\\small-explosion-sound-effect.mp3')
+        collidesound.play()
         return True
     else:
         return False
@@ -79,9 +100,9 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                spaceshipxchange = -1.55
+                spaceshipxchange = -4.5
             if event.key == pygame.K_RIGHT:
-                spaceshipxchange = 1.55
+                spaceshipxchange = 4.5
             if event.key == pygame.K_SPACE:
                 if firing == False:
                     rocketx = spaceshipx
@@ -93,7 +114,7 @@ while running:
 
     if firing is True:
         shootrocket(rocketx + 36, rockety)
-        rockety -= 1.5
+        rockety -= 5
 
     if rockety <= 0:
         firing = False
@@ -107,7 +128,7 @@ while running:
 
     if asteroid1falling == True:
         if timesfallen < 6:
-            asteroid1y += 0.5
+            asteroid1y += 2.5
             asteroidpos(asteroid1x, asteroid1y)
 
         iscollided = hitasteroid1()
@@ -130,16 +151,34 @@ while running:
 
         if timesfallen >= 6 and timesfallen < 10:
             asteroid1 = pygame.image.load('C:\\asteroid2.png')
-            asteroid1y += 1.25
+            asteroid1y += 4.5
             asteroidpos(asteroid1x, asteroid1y)
 
         if timesfallen >= 10 and timesfallen < 16:
             asteroid1 = pygame.image.load('C:\\asteroid3.png')
-            asteroid1y += 1.5
+            asteroid1y += 6
             asteroidpos(asteroid1x, asteroid1y)
+
+        if timesfallen >= 16:
+            gameoverscreen()
+
+        if playerhealth <= 0:
+            asteroid1x = 2000
+            asteroid1y -= 6
+            gameoverscreen()
 
         showscore(textx, texty)
         showhealth(healthx, healthy)
+
+        conn = sqlite3.connect('Scores.db')
+        c = conn.cursor()
+
+        c.execute('INSERT INTO scores VALUES (:score)', {
+            'score' : playerscore
+        })
+        conn.commit()
+        conn.close()
+
+        highscore()
+
     pygame.display.update()
-conn.commit()
-conn.close()
